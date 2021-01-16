@@ -1,37 +1,20 @@
 """
-Demo Flask application to test the operation of Flask with socket.io
+Demo of Flask application and socket.io
 
-Aim is to create a webpage that is constantly updated with random numbers from a background python process.
-
-30th May 2014
-
-===================
-
-Updated 13th April 2018
-
-+ Upgraded code to Python 3
-+ Used Python3 SocketIO implementation
-+ Updated CDN Javascript and CSS sources
-
+Inspired by : https://github.com/shanealynn/async_flask
 """
 
-
-
-
 # Start with a basic flask app webpage.
-from flask_socketio import SocketIO, emit
-from flask import Flask, render_template, url_for, copy_current_request_context
+from flask_socketio import SocketIO
+from flask import Flask, render_template
 from random import random
-from time import sleep
 from threading import Thread, Event
-
-__author__ = 'slynn'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 
-#turn the flask app into a socketio app
+#Initiate socketio server
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 
 #random number Generator Thread
@@ -48,8 +31,9 @@ def randomNumberGenerator():
     while not thread_stop_event.isSet():
         number = round(random()*10, 3)
         print(number)
+        # socket io server send data to client
         socketio.emit('newnumber', {'number': number}, namespace='/test')
-        socketio.sleep(5)
+        socketio.sleep(1)
 
 
 @app.route('/')
